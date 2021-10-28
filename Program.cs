@@ -16,12 +16,16 @@ namespace steamachievements
         static readonly HttpClient client = new HttpClient();
         static async Task Main(string[] args)
         {
-            // 76561198184545774
-            string apikey = System.IO.File.ReadAllText(@"apikey");
-            ulong userID = getUserID();
-            var webInterfaceFactory = new SteamWebInterfaceFactory(apikey);
+            SteamWebInterfaceFactory webInterfaceFactory = initiateAPI();
             var steamUserInterface = webInterfaceFactory.CreateSteamWebInterface<SteamUser>(client);
             var steamPlayerInterface = webInterfaceFactory.CreateSteamWebInterface<PlayerService>();
+            var userID = await getUserID(steamUserInterface);
+            await getPlayerStatus(steamUserInterface, userID);
+
+        }
+
+        private static async Task getPlayerStatus(SteamUser steamUserInterface, ulong userID)
+        {
             var playerSummaryResponse = await steamUserInterface.GetPlayerSummaryAsync(userID);
             var playerSummaryData = playerSummaryResponse.Data;
             if (playerSummaryData.PlayingGameName != null)
@@ -32,18 +36,21 @@ namespace steamachievements
             {
                 Console.WriteLine($"Steam user {playerSummaryData.Nickname} is currently {playerSummaryData.UserStatus} and is currently not playing a game.");
             }
-            // var playerOwnedGames = await steamPlayerInterface.GetOwnedGamesAsync(76561198184545774, includeAppInfo: true);
-            // foreach (var vexo in playerOwnedGames.Data.OwnedGames)
-            // {
-            //     Console.WriteLine(vexo.Name);
-            // }
         }
 
-        private static ulong getUserID()
+        private static SteamWebInterfaceFactory initiateAPI()
         {
-            Console.WriteLine("Please enter your steam profile ID.");
+            string apikey = System.IO.File.ReadAllText(@"apikey");
+            var webInterfaceFactory = new SteamWebInterfaceFactory(apikey);
+            return webInterfaceFactory;
+        }
+
+        static async Task<ulong> getUserID(SteamUser userInterface)
+        {
+            Console.WriteLine("Please enter your steam user link.");
             var input = Console.ReadLine();
-            return Convert.ToUInt64(input);
+            var steamUserID = await userInterface.ResolveVanityUrlAsync(input);
+            return steamUserID.Data;
         }
     }
 }
