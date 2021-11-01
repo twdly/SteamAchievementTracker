@@ -7,7 +7,7 @@ using SteamWebAPI2.Utilities;
 using SteamWebAPI2.Models;
 using SteamWebAPI2.Exceptions;
 using System.IO;
-
+using System.Collections.Generic;
 
 namespace steamachievements
 {
@@ -17,11 +17,36 @@ namespace steamachievements
         static async Task Main(string[] args)
         {
             SteamWebInterfaceFactory webInterfaceFactory = initiateAPI();
+
             var steamUserInterface = webInterfaceFactory.CreateSteamWebInterface<SteamUser>(client);
             var steamPlayerInterface = webInterfaceFactory.CreateSteamWebInterface<PlayerService>();
-            var userID = await getUserID(steamUserInterface);
-            await getPlayerStatus(steamUserInterface, userID);
 
+            var userID = await getUserID(steamUserInterface);
+            var playerSummaryResponse = await steamUserInterface.GetPlayerSummaryAsync(userID);
+            await getPlayerStatus(steamUserInterface, userID);
+            var games = await getOwnedGames(steamPlayerInterface, userID);
+
+            checkGamesAmount(playerSummaryResponse, games);
+        }
+
+        private static void checkGamesAmount(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games)
+        {
+            int unplayedGames = 0;
+            foreach (var vexo in games.OwnedGames)
+            {
+                if (vexo.PlaytimeForever.TotalHours == 0)
+                {
+                    // Console.WriteLine(vexo.Name);
+                    unplayedGames++;
+                }
+            }
+            Console.WriteLine($"User {playerSummaryResponse.Data.Nickname} currently owns {games.GameCount} games. {unplayedGames} of which are unplayed.");
+        }
+
+        private static async Task<Steam.Models.SteamCommunity.OwnedGamesResultModel> getOwnedGames(PlayerService steamPlayerInterface, ulong userID)
+        {
+            var games = await steamPlayerInterface.GetOwnedGamesAsync(userID, includeAppInfo: true);
+            return games.Data;
         }
 
         private static async Task getPlayerStatus(SteamUser steamUserInterface, ulong userID)
