@@ -27,6 +27,20 @@ namespace steamachievements
             var games = await getOwnedGames(steamPlayerInterface, userID);
 
             checkGamesAmount(playerSummaryResponse, games);
+            selectRandomGame(games);
+        }
+
+        private static void selectRandomGame(Steam.Models.SteamCommunity.OwnedGamesResultModel games)
+        {
+            var random = new Random();
+            int gameCount = Convert.ToInt32(games.GameCount);
+            int number = random.Next(maxValue: gameCount);
+            List<string> gameList = new List<string>();
+            foreach (var game in games.OwnedGames)
+            {
+                gameList.Add(game.Name);
+            }
+            Console.WriteLine($"Tæj mineself has decided that you will play {gameList[number]}");
         }
 
         private static void checkGamesAmount(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games)
