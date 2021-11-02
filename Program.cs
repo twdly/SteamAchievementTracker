@@ -16,7 +16,6 @@ namespace steamachievements
         static readonly HttpClient client = new HttpClient();
         static async Task Main(string[] args)
         {
-            // tax evasion
             SteamWebInterfaceFactory webInterfaceFactory = initiateAPI();
 
             var steamUserInterface = webInterfaceFactory.CreateSteamWebInterface<SteamUser>(client);
