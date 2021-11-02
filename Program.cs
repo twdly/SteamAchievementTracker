@@ -73,9 +73,20 @@ namespace steamachievements
         static async Task<ulong> getUserID(SteamUser userInterface)
         {
             Console.WriteLine("Please enter your steam user link.");
-            var input = Console.ReadLine();
-            var steamUserID = await userInterface.ResolveVanityUrlAsync(input);
-            return steamUserID.Data;
+            while (true)
+            {
+                var input = Console.ReadLine();
+                try
+                {
+                    var steamUserID = await userInterface.ResolveVanityUrlAsync(input);
+                    return steamUserID.Data;
+                }
+                catch (SteamWebAPI2.Exceptions.VanityUrlNotResolvedException)
+                {
+                    Console.WriteLine("That Steam URL could not be found. Please check your spelling and try again.");
+                    continue;
+                }
+            }
         }
     }
 }
