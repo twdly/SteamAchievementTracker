@@ -32,9 +32,9 @@ namespace steamachievements
         private static void checkGamesAmount(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games)
         {
             int unplayedGames = 0;
-            foreach (var vexo in games.OwnedGames)
+            foreach (var game in games.OwnedGames)
             {
-                if (vexo.PlaytimeForever.TotalHours == 0)
+                if (game.PlaytimeForever.TotalHours == 0)
                 {
                     // Console.WriteLine(vexo.Name);
                     unplayedGames++;
