@@ -26,7 +26,7 @@ namespace steamachievements
             var playerSummaryResponse = await steamUserInterface.GetPlayerSummaryAsync(userID);
             await getPlayerStatus(steamUserInterface, userID);
             var games = await getOwnedGames(steamPlayerInterface, userID);
-
+            checkLibraryPublicity(playerSummaryResponse, games);
             checkGamesAmount(playerSummaryResponse, games);
             selectRandomGame(games);
         }
@@ -56,6 +56,17 @@ namespace steamachievements
                 }
             }
             Console.WriteLine($"User {playerSummaryResponse.Data.Nickname} currently owns {games.GameCount} games. {unplayedGames} of which are unplayed.");
+
+        }
+
+        private static void checkLibraryPublicity(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games)
+        {
+            if (games.GameCount <= 0)
+            {
+                Console.WriteLine($"Error: {playerSummaryResponse.Data.Nickname} either does not own any games or has their library private.");
+                System.Environment.Exit(0);
+            }
+
         }
 
         private static async Task<Steam.Models.SteamCommunity.OwnedGamesResultModel> getOwnedGames(PlayerService steamPlayerInterface, ulong userID)
