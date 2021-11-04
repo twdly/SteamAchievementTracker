@@ -13,7 +13,6 @@ namespace steamachievements
 {
     class Program
     {
-        // aaaaaaaaaa
         static readonly HttpClient client = new HttpClient();
         static async Task Main(string[] args)
         {
@@ -29,6 +28,17 @@ namespace steamachievements
             checkLibraryPublicity(playerSummaryResponse, games);
             checkGamesAmount(playerSummaryResponse, games);
             selectRandomGame(games);
+            getTotalPlaytime(playerSummaryResponse, games);
+        }
+
+        private static void getTotalPlaytime(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games)
+        {
+            TimeSpan totalPlaytime = new TimeSpan();
+            foreach (var vexo in games.OwnedGames)
+            {
+                totalPlaytime = vexo.PlaytimeForever + totalPlaytime;
+            }
+            Console.WriteLine($"{playerSummaryResponse.Data.Nickname} has a total playtime of {totalPlaytime.TotalHours} hours.");
         }
 
         private static void selectRandomGame(Steam.Models.SteamCommunity.OwnedGamesResultModel games)
