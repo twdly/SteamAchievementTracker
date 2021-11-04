@@ -112,6 +112,11 @@ namespace steamachievements
             while (true)
             {
                 var input = Console.ReadLine();
+                ulong vexo;
+                if (ulong.TryParse(input, out vexo))
+                {
+                    return vexo;
+                }
                 try
                 {
                     var steamUserID = await userInterface.ResolveVanityUrlAsync(input);
