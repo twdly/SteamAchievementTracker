@@ -1,2 +1,2 @@
 # SteamAchievementTracker
-roilo boilo
+This is a project which will eventually provide statistics to guide people who want to get the most out of their game library on Steam by getting 100% completion in as many games as possible. In order to use this project, you will need to obtain an API key from [here](https://steamcommunity.com/dev/apikey) and then put it into a file called `apikey` and place this inside the directory of the project. 
