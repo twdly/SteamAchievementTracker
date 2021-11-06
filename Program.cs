@@ -26,9 +26,41 @@ namespace steamachievements
             await getPlayerStatus(steamUserInterface, userID);
             var games = await getOwnedGames(steamPlayerInterface, userID);
             checkLibraryPublicity(playerSummaryResponse, games);
-            checkGamesAmount(playerSummaryResponse, games);
-            selectRandomGame(games);
-            getTotalPlaytime(playerSummaryResponse, games);
+            getInput(playerSummaryResponse, games);
+            Console.WriteLine("\nThank you for using twdly's Steam Achievement Tracker.");
+        }
+
+        private static void getInput(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games)
+        {
+            Console.WriteLine("What information would you like?");
+            bool validInputReceived = false;
+            while (true)
+            {
+
+                var input = Console.ReadLine();
+                switch (input.ToLower())
+                {
+                    case "games":
+                        checkGamesAmount(playerSummaryResponse, games);
+                        validInputReceived = true;
+                        break;
+                    case "playtime":
+                        getTotalPlaytime(playerSummaryResponse, games);
+                        validInputReceived = true;
+                        break;
+                    case "random game":
+                        selectRandomGame(games);
+                        validInputReceived = true;
+                        break;
+                    default:
+                        Console.WriteLine("That option cannot be found. Please check your spelling and try again.");
+                        continue;
+                }
+                if (validInputReceived)
+                {
+                    break;
+                }
+            }
         }
 
         private static void getTotalPlaytime(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games)
@@ -62,15 +94,12 @@ namespace steamachievements
             {
                 if (game.PlaytimeForever.TotalHours == 0)
                 {
-                    // Console.WriteLine(vexo.Name);
                     unplayedGames++;
                 }
             }
             try
             {
-                percentagePlayed = (Convert.ToDecimal(unplayedGames) / Convert.ToDecimal(games.GameCount)) * 100;
-                percentagePlayed = Math.Round(percentagePlayed, 2);
-                Console.WriteLine(percentagePlayed);
+                percentagePlayed = Math.Round((Convert.ToDecimal(unplayedGames) / Convert.ToDecimal(games.GameCount)) * 100, 2);
             }
             catch (System.DivideByZeroException)
             {
