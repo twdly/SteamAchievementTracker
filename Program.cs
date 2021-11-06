@@ -103,13 +103,16 @@ namespace steamachievements
             }
             catch (System.DivideByZeroException)
             {
-                Console.WriteLine($"{playerSummaryResponse.Data.Nickname} has no unplayed games. What a gamer!");
                 percentagePlayed = 0;
             }
             Console.WriteLine($"User {playerSummaryResponse.Data.Nickname} currently owns {games.GameCount} games. {unplayedGames} of which are unplayed.");
             if (percentagePlayed != 0)
             {
                 Console.WriteLine($"This means that {playerSummaryResponse.Data.Nickname} has never played {percentagePlayed}% of their library.");
+            }
+            else
+            {
+                Console.WriteLine($"{playerSummaryResponse.Data.Nickname} has no unplayed games. What a gamer!");
             }
 
         }
