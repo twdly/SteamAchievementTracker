@@ -78,7 +78,7 @@ namespace steamachievements
             {
                 totalPlaytime = vexo.PlaytimeForever + totalPlaytime;
             }
-            Console.WriteLine($"{playerSummaryResponse.Data.Nickname} has a total playtime of {totalPlaytime.TotalHours} hours.");
+            Console.WriteLine($"{playerSummaryResponse.Data.Nickname} has a total playtime of {Math.Round(totalPlaytime.TotalHours, 2)} hours.");
         }
 
         private static void selectRandomGame(Steam.Models.SteamCommunity.OwnedGamesResultModel games)
