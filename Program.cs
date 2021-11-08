@@ -20,8 +20,16 @@ namespace steamachievements
 
             var steamUserInterface = webInterfaceFactory.CreateSteamWebInterface<SteamUser>(client);
             var steamPlayerInterface = webInterfaceFactory.CreateSteamWebInterface<PlayerService>();
-
-            var userID = await getUserID(steamUserInterface);
+            ulong userID = 0;
+            try
+            {
+                userID = await getUserID(steamUserInterface);
+            }
+            catch (System.Net.Http.HttpRequestException)
+            {
+                Console.WriteLine("Unable to establish a connection to Steam. Please check your internet and try again");
+                System.Environment.Exit(1);
+            }
             var playerSummaryResponse = await steamUserInterface.GetPlayerSummaryAsync(userID);
             await getPlayerStatus(steamUserInterface, userID);
             var games = await getOwnedGames(steamPlayerInterface, userID);
@@ -122,7 +130,7 @@ namespace steamachievements
             if (games.GameCount <= 0)
             {
                 Console.WriteLine($"Error: {playerSummaryResponse.Data.Nickname} either does not own any games or has their library private.");
-                System.Environment.Exit(0);
+                System.Environment.Exit(1);
             }
 
         }
