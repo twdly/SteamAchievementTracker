@@ -76,9 +76,38 @@ namespace steamachievements
             TimeSpan totalPlaytime = new TimeSpan();
             foreach (var vexo in games.OwnedGames)
             {
-                totalPlaytime = vexo.PlaytimeForever + totalPlaytime;
+                totalPlaytime += vexo.PlaytimeForever;
             }
-            Console.WriteLine($"{playerSummaryResponse.Data.Nickname} has a total playtime of {Math.Round(totalPlaytime.TotalHours, 2)} hours.");
+            var playtimeAndUnit = getPlaytimeUnits(totalPlaytime);
+            Console.WriteLine($"{playerSummaryResponse.Data.Nickname} has a total playtime of {Math.Round(playtimeAndUnit.Item1, 2)} {playtimeAndUnit.Item2}.");
+        }
+
+        private static (double, string) getPlaytimeUnits(TimeSpan totalPlaytime)
+        {
+            while (true)
+            {
+                Console.WriteLine("What unit would you like the playtime to be in?\n (y)ears, (d)ays, (h)ours, (m)inutes.");
+                var input = Console.ReadLine();
+                (double, string) output;
+                switch (input.ToLower())
+                {
+                    case "y":
+                        output = (totalPlaytime.TotalDays / 365.25, "years");
+                        return output;
+                    case "d":
+                        output = (totalPlaytime.TotalDays, "days");
+                        return output;
+                    case "h":
+                        output = (totalPlaytime.TotalHours, "hours");
+                        return output;
+                    case "m":
+                        output = (totalPlaytime.TotalHours * 60, "minutes");
+                        return output;
+                    default:
+                        Console.WriteLine("Invalid input. Please try again, vexo.");
+                        continue;
+                }
+            }
         }
 
         private static void selectRandomGame(Steam.Models.SteamCommunity.OwnedGamesResultModel games)
