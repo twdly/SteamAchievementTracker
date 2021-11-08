@@ -74,9 +74,9 @@ namespace steamachievements
         private static void getTotalPlaytime(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games)
         {
             TimeSpan totalPlaytime = new TimeSpan();
-            foreach (var vexo in games.OwnedGames)
+            foreach (var game in games.OwnedGames)
             {
-                totalPlaytime += vexo.PlaytimeForever;
+                totalPlaytime += game.PlaytimeForever;
             }
             var playtimeAndUnit = getPlaytimeUnits(totalPlaytime);
             Console.WriteLine($"{playerSummaryResponse.Data.Nickname} has a total playtime of {Math.Round(playtimeAndUnit.Item1, 2)} {playtimeAndUnit.Item2}.");
