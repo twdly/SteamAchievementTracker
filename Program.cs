@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using SteamWebAPI2;
 using SteamWebAPI2.Interfaces;
 using SteamWebAPI2.Utilities;
-using SteamWebAPI2.Models;
-using SteamWebAPI2.Exceptions;
-using System.IO;
 using System.Collections.Generic;
 
 namespace steamachievements
@@ -73,13 +69,13 @@ namespace steamachievements
 
         private static void getTotalPlaytime(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games)
         {
-            TimeSpan totalPlaytime = new TimeSpan();
+            var totalPlaytime = new TimeSpan();
             foreach (var game in games.OwnedGames)
             {
                 totalPlaytime += game.PlaytimeForever;
             }
-            var playtimeAndUnit = getPlaytimeUnits(totalPlaytime);
-            Console.WriteLine($"{playerSummaryResponse.Data.Nickname} has a total playtime of {Math.Round(playtimeAndUnit.Item1, 2)} {playtimeAndUnit.Item2}.");
+            var (playtime, unit) = getPlaytimeUnits(totalPlaytime);
+            Console.WriteLine($"{playerSummaryResponse.Data.Nickname} has a total playtime of {Math.Round(playtime, 2)} {unit}.");
         }
 
         private static (double, string) getPlaytimeUnits(TimeSpan totalPlaytime)
@@ -88,21 +84,16 @@ namespace steamachievements
             {
                 Console.WriteLine("What unit would you like the playtime to be in?\n (y)ears, (d)ays, (h)ours, (m)inutes.");
                 var input = Console.ReadLine();
-                (double, string) output;
                 switch (input.ToLower())
                 {
                     case "y":
-                        output = (totalPlaytime.TotalDays / 365.25, "years");
-                        return output;
+                        return (totalPlaytime.TotalDays / 365.25, "years");
                     case "d":
-                        output = (totalPlaytime.TotalDays, "days");
-                        return output;
+                        return (totalPlaytime.TotalDays, "days");
                     case "h":
-                        output = (totalPlaytime.TotalHours, "hours");
-                        return output;
+                        return (totalPlaytime.TotalHours, "hours");
                     case "m":
-                        output = (totalPlaytime.TotalHours * 60, "minutes");
-                        return output;
+                        return (totalPlaytime.TotalMinutes, "minutes");
                     default:
                         Console.WriteLine("Invalid input. Please try again, vexo.");
                         continue;
