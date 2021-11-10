@@ -16,6 +16,7 @@ namespace steamachievements
 
             var steamUserInterface = webInterfaceFactory.CreateSteamWebInterface<SteamUser>(client);
             var steamPlayerInterface = webInterfaceFactory.CreateSteamWebInterface<PlayerService>();
+            var steamUserStats = webInterfaceFactory.CreateSteamWebInterface<SteamUserStats>();
             ulong userID = 0;
             try
             {
@@ -30,11 +31,11 @@ namespace steamachievements
             await getPlayerStatus(steamUserInterface, userID);
             var games = await getOwnedGames(steamPlayerInterface, userID);
             checkLibraryPublicity(playerSummaryResponse, games);
-            getInput(playerSummaryResponse, games);
+            await getInput(playerSummaryResponse, games, steamUserStats, userID);
             Console.WriteLine("\nThank you for using twdly's Steam Achievement Tracker.");
         }
 
-        private static void getInput(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games)
+        private static async Task getInput(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games, SteamUserStats steamUserStats, ulong userID)
         {
             Console.WriteLine("What information would you like?");
             bool validInputReceived = false;
@@ -56,6 +57,10 @@ namespace steamachievements
                         selectRandomGame(games);
                         validInputReceived = true;
                         break;
+                    case "achievements":
+                        await analyseAchievements(playerSummaryResponse, games, steamUserStats, userID);
+                        validInputReceived = true;
+                        break;
                     default:
                         Console.WriteLine("That option cannot be found. Please check your spelling and try again.");
                         continue;
@@ -64,6 +69,15 @@ namespace steamachievements
                 {
                     break;
                 }
+            }
+        }
+
+        private static async Task analyseAchievements(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games, SteamUserStats steamUserStats, ulong userID)
+        {
+            var achievements = await steamUserStats.GetGlobalAchievementPercentagesForAppAsync(730);
+            foreach (var achievement in achievements.Data)
+            {
+                Console.WriteLine($"{achievement.Name} has a roilo of {achievement.Percent}");
             }
         }
 
