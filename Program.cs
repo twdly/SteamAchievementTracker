@@ -74,10 +74,25 @@ namespace steamachievements
 
         private static async Task analyseAchievements(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games, SteamUserStats steamUserStats, ulong userID)
         {
-            var achievements = await steamUserStats.GetGlobalAchievementPercentagesForAppAsync(730);
-            foreach (var achievement in achievements.Data)
+            foreach (var game in games.OwnedGames)
             {
-                Console.WriteLine($"{achievement.Name} has a roilo of {achievement.Percent}");
+                ISteamWebResponse<IReadOnlyCollection<Steam.Models.SteamCommunity.GlobalAchievementPercentageModel>> achievements;
+                try
+                {
+                    achievements = await steamUserStats.GetGlobalAchievementPercentagesForAppAsync(game.AppId);
+                }
+                catch (System.Net.Http.HttpRequestException)
+                {
+                    continue;
+                }
+                Console.WriteLine($"Achievements in {game.Name} are:");
+                if (achievements.ContentLength != 0)
+                {
+                    foreach (var achievement in achievements.Data)
+                    {
+                        Console.WriteLine($"{achievement.Name} has a roilo of {achievement.Percent}");
+                    }
+                }
             }
         }
 
