@@ -168,7 +168,6 @@ namespace steamachievements
         private static void checkGamesAmount(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games)
         {
             int unplayedGames = 0;
-            decimal percentagePlayed;
             foreach (var game in games.OwnedGames)
             {
                 if (game.PlaytimeForever.TotalHours == 0)
@@ -176,14 +175,7 @@ namespace steamachievements
                     unplayedGames++;
                 }
             }
-            try
-            {
-                percentagePlayed = Math.Round((Convert.ToDecimal(unplayedGames) / Convert.ToDecimal(games.GameCount)) * 100, 2);
-            }
-            catch (System.DivideByZeroException)
-            {
-                percentagePlayed = 0;
-            }
+            decimal percentagePlayed = Math.Round((Convert.ToDecimal(unplayedGames) / Convert.ToDecimal(games.GameCount)) * 100, 2);
             Console.WriteLine($"User {playerSummaryResponse.Data.Nickname} currently owns {games.GameCount} games. {unplayedGames} of which are unplayed.");
             if (percentagePlayed != 0)
             {
