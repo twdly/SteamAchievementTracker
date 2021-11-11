@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using SteamWebAPI2.Interfaces;
 using SteamWebAPI2.Utilities;
 using System.Collections.Generic;
+using Steam.Models.SteamPlayer;
 
 namespace steamachievements
 {
@@ -83,15 +84,36 @@ namespace steamachievements
                 }
                 catch (System.Net.Http.HttpRequestException)
                 {
+                    Console.WriteLine($"{game.Name} does not have any achievements");
                     continue;
                 }
                 Console.WriteLine($"Achievements in {game.Name} are:");
                 if (achievements.ContentLength != 0)
                 {
+                    var achievementCount = 0;
                     foreach (var achievement in achievements.Data)
                     {
                         Console.WriteLine($"{achievement.Name} has a roilo of {achievement.Percent}");
+                        achievementCount++;
                     }
+                    Console.WriteLine($"{game.Name} has {achievementCount} achievements.");
+                }
+            }
+            foreach (var game in games.OwnedGames)
+            {
+                ISteamWebResponse<PlayerAchievementResultModel> personalAchievements;
+                try
+                {
+                    personalAchievements = await steamUserStats.GetPlayerAchievementsAsync(game.AppId, userID);
+                }
+                catch (System.Net.Http.HttpRequestException)
+                {
+                    Console.WriteLine($"{game.Name} has no achievements");
+                    continue;
+                }
+                foreach (var vexo in personalAchievements.Data.Achievements)
+                {
+                    Console.WriteLine($"This vexo has achieved {vexo.APIName}");
                 }
             }
         }
