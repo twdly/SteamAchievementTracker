@@ -38,12 +38,11 @@ namespace steamachievements
 
         private static async Task getInput(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games, SteamUserStats steamUserStats, ulong userID)
         {
-            Console.WriteLine("What information would you like?");
             bool validInputReceived = false;
             while (true)
             {
 
-                var input = Console.ReadLine();
+                var input = prompt("What information would you like?");
                 switch (input.ToLower())
                 {
                     case "games":
@@ -71,6 +70,12 @@ namespace steamachievements
                     break;
                 }
             }
+        }
+
+        private static string prompt(string message)
+        {
+            Console.Write($"\n{message}\n> ");
+            return Console.ReadLine();
         }
 
         private static async Task analyseAchievements(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games, SteamUserStats steamUserStats, ulong userID)
@@ -133,8 +138,7 @@ namespace steamachievements
         {
             while (true)
             {
-                Console.WriteLine("What unit would you like the playtime to be in?\n (y)ears, (d)ays, (h)ours, (m)inutes.");
-                var input = Console.ReadLine();
+                var input = prompt("What unit would you like the playtime to be in?\n (y)ears, (d)ays, (h)ours, (m)inutes.");
                 switch (input.ToLower())
                 {
                     case "y":
@@ -227,10 +231,9 @@ namespace steamachievements
 
         static async Task<ulong> getUserID(SteamUser userInterface)
         {
-            Console.WriteLine("Please enter your steam user link.");
             while (true)
             {
-                var input = Console.ReadLine();
+                var input = prompt("Please enter your steam user link.");
                 ulong vexo;
                 if (ulong.TryParse(input, out vexo))
                 {
