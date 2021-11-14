@@ -6,6 +6,7 @@ using SteamWebAPI2.Interfaces;
 using SteamWebAPI2.Utilities;
 using System.Collections.Generic;
 using Steam.Models.SteamPlayer;
+using Steam.Models.SteamCommunity;
 
 namespace steamachievements
 {
@@ -51,7 +52,7 @@ namespace steamachievements
             Console.WriteLine("\nThank you for using twdly's Steam Achievement Tracker.");
         }
 
-        private static async Task getInput(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games, SteamUserStats steamUserStats, ulong userID)
+        private static async Task getInput(ISteamWebResponse<PlayerSummaryModel> playerSummaryResponse, OwnedGamesResultModel games, SteamUserStats steamUserStats, ulong userID)
         {
             bool validInputReceived = false;
             while (true)
@@ -93,11 +94,11 @@ namespace steamachievements
             return Console.ReadLine();
         }
 
-        private static async Task analyseAchievements(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games, SteamUserStats steamUserStats, ulong userID)
+        private static async Task analyseAchievements(ISteamWebResponse<PlayerSummaryModel> playerSummaryResponse, OwnedGamesResultModel games, SteamUserStats steamUserStats, ulong userID)
         {
             foreach (var game in games.OwnedGames)
             {
-                ISteamWebResponse<IReadOnlyCollection<Steam.Models.SteamCommunity.GlobalAchievementPercentageModel>> achievements;
+                ISteamWebResponse<IReadOnlyCollection<GlobalAchievementPercentageModel>> achievements;
                 try
                 {
                     achievements = await steamUserStats.GetGlobalAchievementPercentagesForAppAsync(game.AppId);
@@ -138,7 +139,7 @@ namespace steamachievements
             }
         }
 
-        private static void getTotalPlaytime(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games)
+        private static void getTotalPlaytime(ISteamWebResponse<PlayerSummaryModel> playerSummaryResponse, OwnedGamesResultModel games)
         {
             var totalPlaytime = new TimeSpan();
             foreach (var game in games.OwnedGames)
@@ -171,7 +172,7 @@ namespace steamachievements
             }
         }
 
-        private static void selectRandomGame(Steam.Models.SteamCommunity.OwnedGamesResultModel games)
+        private static void selectRandomGame(OwnedGamesResultModel games)
         {
             var random = new Random();
             int gameCount = Convert.ToInt32(games.GameCount);
@@ -184,7 +185,7 @@ namespace steamachievements
             Console.WriteLine($"Tæj mineself has decided that you will play {gameList[number]}");
         }
 
-        private static void checkGamesAmount(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games)
+        private static void checkGamesAmount(ISteamWebResponse<PlayerSummaryModel> playerSummaryResponse, OwnedGamesResultModel games)
         {
             int unplayedGames = 0;
             foreach (var game in games.OwnedGames)
@@ -207,7 +208,7 @@ namespace steamachievements
 
         }
 
-        private static void checkLibraryPublicity(ISteamWebResponse<Steam.Models.SteamCommunity.PlayerSummaryModel> playerSummaryResponse, Steam.Models.SteamCommunity.OwnedGamesResultModel games)
+        private static void checkLibraryPublicity(ISteamWebResponse<PlayerSummaryModel> playerSummaryResponse, OwnedGamesResultModel games)
         {
             if (games.GameCount <= 0)
             {
@@ -217,7 +218,7 @@ namespace steamachievements
 
         }
 
-        private static async Task<Steam.Models.SteamCommunity.OwnedGamesResultModel> getOwnedGames(PlayerService steamPlayerInterface, ulong userID)
+        private static async Task<OwnedGamesResultModel> getOwnedGames(PlayerService steamPlayerInterface, ulong userID)
         {
             var games = await steamPlayerInterface.GetOwnedGamesAsync(userID, includeAppInfo: true);
             return games.Data;
