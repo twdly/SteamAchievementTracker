@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using SteamWebAPI2.Interfaces;
@@ -13,6 +14,41 @@ namespace steamachievements
         static readonly HttpClient client = new HttpClient();
         static async Task Main(string[] args)
         {
+            // Use command line arguments to create, read or modify apikey using argument -apikey
+            if (args.Length == 2)
+            {
+                if (args[0] == "-apikey")
+                {
+                    if (File.Exists(@"apikey"))
+                    {
+                        var oldKey = File.ReadAllText(@"apikey");
+                        File.WriteAllText(@"apikey", args[1]);
+                        Console.WriteLine($"API key successfully changed from {oldKey} to {args[1]}");
+                        System.Environment.Exit(0);
+                    }
+                    else
+                    {
+                        File.WriteAllText("apikey", args[1]);
+                        Console.WriteLine("API key successfully added and the software is ready to use.");
+                        System.Environment.Exit(0);
+                    }
+                }
+            }
+            else if (args.Length == 1)
+            {
+                if (args[0] == "-apikey" && File.Exists(@"apikey"))
+                {
+                    var key = File.ReadAllText(@"apikey");
+                    Console.WriteLine($"Current API key is {key}.");
+                    System.Environment.Exit(0);
+                }
+                else if (args[0] == "-apikey")
+                {
+                    Console.WriteLine("API key file not found.");
+                    System.Environment.Exit(1);
+                }
+            }
+
             SteamWebInterfaceFactory webInterfaceFactory = initiateAPI();
 
             var steamUserInterface = webInterfaceFactory.CreateSteamWebInterface<SteamUser>(client);
