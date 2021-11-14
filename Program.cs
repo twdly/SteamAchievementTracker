@@ -54,36 +54,26 @@ namespace steamachievements
 
         private static async Task getInput(ISteamWebResponse<PlayerSummaryModel> playerSummaryResponse, OwnedGamesResultModel games, SteamUserStats steamUserStats, ulong userID)
         {
-            bool validInputReceived = false;
             while (true)
             {
-
                 var input = prompt("What information would you like?");
                 switch (input.ToLower())
                 {
                     case "games":
                         checkGamesAmount(playerSummaryResponse, games);
-                        validInputReceived = true;
-                        break;
+                        return;
                     case "playtime":
                         getTotalPlaytime(playerSummaryResponse, games);
-                        validInputReceived = true;
-                        break;
+                        return;
                     case "random game":
                         selectRandomGame(games);
-                        validInputReceived = true;
-                        break;
+                        return;
                     case "achievements":
                         await analyseAchievements(playerSummaryResponse, games, steamUserStats, userID);
-                        validInputReceived = true;
-                        break;
+                        return;
                     default:
                         Console.WriteLine("That option cannot be found. Please check your spelling and try again.");
                         continue;
-                }
-                if (validInputReceived)
-                {
-                    break;
                 }
             }
         }
