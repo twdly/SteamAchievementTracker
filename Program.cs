@@ -15,45 +15,17 @@ namespace steamachievements
         static async Task Main(string[] args)
         {
             // Use command line arguments to create, read or modify apikey using argument -apikey
-            if (args.Length == 2)
-            {
-                if (args[0] == "-apikey")
-                {
-                    if (File.Exists(@"apikey"))
-                    {
-                        var oldKey = File.ReadAllText(@"apikey");
-                        File.WriteAllText(@"apikey", args[1]);
-                        Console.WriteLine($"API key successfully changed from {oldKey} to {args[1]}");
-                        System.Environment.Exit(0);
-                    }
-                    else
-                    {
-                        File.WriteAllText("apikey", args[1]);
-                        Console.WriteLine("API key successfully added and the software is ready to use.");
-                        System.Environment.Exit(0);
-                    }
-                }
-            }
-            else if (args.Length == 1)
-            {
-                if (args[0] == "-apikey" && File.Exists(@"apikey"))
-                {
-                    var key = File.ReadAllText(@"apikey");
-                    Console.WriteLine($"Current API key is {key}.");
-                    System.Environment.Exit(0);
-                }
-                else if (args[0] == "-apikey")
-                {
-                    Console.WriteLine("API key file not found.");
-                    System.Environment.Exit(1);
-                }
-            }
+            setapiKey(args);
 
+            // Use API key to prepare connection to Steam
             SteamWebInterfaceFactory webInterfaceFactory = initiateAPI();
 
+            // Create interfaces to obtain information from Steam Web API
             var steamUserInterface = webInterfaceFactory.CreateSteamWebInterface<SteamUser>(client);
             var steamPlayerInterface = webInterfaceFactory.CreateSteamWebInterface<PlayerService>();
             var steamUserStats = webInterfaceFactory.CreateSteamWebInterface<SteamUserStats>();
+
+            // Get userID from either vanity URL or direct input
             ulong userID = 0;
             try
             {
@@ -64,11 +36,18 @@ namespace steamachievements
                 Console.WriteLine("Unable to establish a connection to Steam. Please check your internet and try again");
                 System.Environment.Exit(1);
             }
+
+            // Write basic information about the user to the console
             var playerSummaryResponse = await steamUserInterface.GetPlayerSummaryAsync(userID);
             await getPlayerStatus(steamUserInterface, userID);
+
+            // Obtain games owned by the user and ensure their library is not private
             var games = await getOwnedGames(steamPlayerInterface, userID);
             checkLibraryPublicity(playerSummaryResponse, games);
+
+            // Ask for user input on what other information they would like
             await getInput(playerSummaryResponse, games, steamUserStats, userID);
+
             Console.WriteLine("\nThank you for using twdly's Steam Achievement Tracker.");
         }
 
@@ -284,6 +263,43 @@ namespace steamachievements
                 {
                     Console.WriteLine("That Steam URL could not be found. Please check your spelling and try again.");
                     continue;
+                }
+            }
+        }
+
+        private static void setapiKey(string[] args)
+        {
+            if (args.Length == 2)
+            {
+                if (args[0] == "-apikey")
+                {
+                    if (File.Exists(@"apikey"))
+                    {
+                        var oldKey = File.ReadAllText(@"apikey");
+                        File.WriteAllText(@"apikey", args[1]);
+                        Console.WriteLine($"API key successfully changed from {oldKey} to {args[1]}");
+                        System.Environment.Exit(0);
+                    }
+                    else
+                    {
+                        File.WriteAllText("apikey", args[1]);
+                        Console.WriteLine("API key successfully added and the software is ready to use.");
+                        System.Environment.Exit(0);
+                    }
+                }
+            }
+            else if (args.Length == 1)
+            {
+                if (args[0] == "-apikey" && File.Exists(@"apikey"))
+                {
+                    var key = File.ReadAllText(@"apikey");
+                    Console.WriteLine($"Current API key is {key}.");
+                    System.Environment.Exit(0);
+                }
+                else if (args[0] == "-apikey")
+                {
+                    Console.WriteLine("API key file not found.\nPlease use the -apikey argument followed by your key to set your API key.");
+                    System.Environment.Exit(1);
                 }
             }
         }
