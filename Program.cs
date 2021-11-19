@@ -69,7 +69,7 @@ namespace steamachievements
                         selectRandomGame(games);
                         return;
                     case "achievements":
-                        await analyseAchievements(playerSummaryResponse, games, steamUserStats, userID);
+                        await GameAchievements.analyseAchievements(playerSummaryResponse, games, steamUserStats, userID);
                         return;
                     default:
                         Console.WriteLine("That option cannot be found. Please check your spelling and try again.");
@@ -78,55 +78,10 @@ namespace steamachievements
             }
         }
 
-        private static string prompt(string message)
+        public static string prompt(string message)
         {
             Console.Write($"\n{message}\n> ");
             return Console.ReadLine();
-        }
-
-        private static async Task analyseAchievements(ISteamWebResponse<PlayerSummaryModel> playerSummaryResponse, OwnedGamesResultModel games, SteamUserStats steamUserStats, ulong userID)
-        {
-            foreach (var game in games.OwnedGames)
-            {
-                ISteamWebResponse<IReadOnlyCollection<GlobalAchievementPercentageModel>> achievements;
-                try
-                {
-                    achievements = await steamUserStats.GetGlobalAchievementPercentagesForAppAsync(game.AppId);
-                }
-                catch (System.Net.Http.HttpRequestException)
-                {
-                    Console.WriteLine($"{game.Name} does not have any achievements");
-                    continue;
-                }
-                Console.WriteLine($"Achievements in {game.Name} are:");
-                if (achievements.ContentLength != 0)
-                {
-                    var achievementCount = 0;
-                    foreach (var achievement in achievements.Data)
-                    {
-                        Console.WriteLine($"{achievement.Name} has a roilo of {achievement.Percent}");
-                        achievementCount++;
-                    }
-                    Console.WriteLine($"{game.Name} has {achievementCount} achievements.");
-                }
-            }
-            foreach (var game in games.OwnedGames)
-            {
-                ISteamWebResponse<PlayerAchievementResultModel> personalAchievements;
-                try
-                {
-                    personalAchievements = await steamUserStats.GetPlayerAchievementsAsync(game.AppId, userID);
-                }
-                catch (System.Net.Http.HttpRequestException)
-                {
-                    Console.WriteLine($"{game.Name} has no achievements");
-                    continue;
-                }
-                foreach (var vexo in personalAchievements.Data.Achievements)
-                {
-                    Console.WriteLine($"This vexo has achieved {vexo.APIName}");
-                }
-            }
         }
 
         private static void getTotalPlaytime(ISteamWebResponse<PlayerSummaryModel> playerSummaryResponse, OwnedGamesResultModel games)
