@@ -7,6 +7,7 @@ using SteamWebAPI2.Utilities;
 using System.Collections.Generic;
 using Steam.Models.SteamPlayer;
 using Steam.Models.SteamCommunity;
+using System.Linq;
 
 namespace steamachievements
 {
@@ -32,16 +33,13 @@ namespace steamachievements
                 }
                 catch (System.Net.Http.HttpRequestException)
                 {
-                    Console.WriteLine($"{game.Name} does not have any achievements");
                     continue;
                 }
-                Console.WriteLine($"Achievements in {game.Name} are:");
                 if (achievements.ContentLength != 0)
                 {
                     var achievementCount = 0;
                     foreach (var achievement in achievements.Data)
                     {
-                        Console.WriteLine($"{achievement.Name} has a roilo of {achievement.Percent}");
                         achievementCount++;
                     }
                     Console.WriteLine($"{game.Name} has {achievementCount} achievements.");
@@ -56,20 +54,15 @@ namespace steamachievements
                         Console.WriteLine($"{game.Name} has no achievements");
                         continue;
                     }
-                    var ownedAchievements = 0;
-                    foreach (var vexo in personalAchievements.Data.Achievements)
-                    {
-                        ownedAchievements++;
-                        Console.WriteLine($"This vexo has achieved {vexo.APIName}");
-                    }
+                    var ownedAchievements = personalAchievements.Data.Achievements.Count();
                     gameStats.OwnedAchievements = ownedAchievements;
                     gameAchievements.Add(gameStats);
                 }
             }
-            getAchievementInput();
+            getAchievementInput(gameAchievements);
         }
 
-        private static void getAchievementInput()
+        private static void getAchievementInput(List<GameAchievements> gameAchievements)
         {
             while (true)
             {
@@ -77,14 +70,34 @@ namespace steamachievements
                 switch (input)
                 {
                     case "stats":
+                        CalculateAccountStats(gameAchievements);
                         return;
                     case "advice":
+                        Console.WriteLine("Vex y and z");
                         return;
                     default:
                         Console.WriteLine("Option not found. Valid options are \"stats\" and \"advice\".");
                         continue;
                 }
             }
+        }
+
+        public static void CalculateAccountStats(List<GameAchievements> gameAchievements)
+        {
+            var achievementTotal = 0;
+            int earnedAchievementTotal = 0;
+            List<Decimal> gamePercentages = new List<decimal>();
+            foreach (var gameAndAchievements in gameAchievements)
+            {
+                earnedAchievementTotal += gameAndAchievements.OwnedAchievements;
+                achievementTotal += gameAndAchievements.TotalAchievements;
+                decimal gamePercentage = (earnedAchievementTotal / achievementTotal) * 100;
+                gamePercentages.Add(gamePercentage);
+            }
+            decimal totalPercentage = gamePercentages.Sum();
+            decimal averagePercentage = Math.Round((totalPercentage / gamePercentages.Count()) * 100, 2);
+            Console.WriteLine($"Vexo has {earnedAchievementTotal} achievements out of a possible {achievementTotal} achievements");
+            Console.WriteLine($"This comes to an average completion percentage of {averagePercentage}");
         }
     }
 }
