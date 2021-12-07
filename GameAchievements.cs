@@ -37,13 +37,6 @@ namespace steamachievements
                 }
                 if (achievements.ContentLength != 0)
                 {
-                    var achievementCount = 0;
-                    foreach (var achievement in achievements.Data)
-                    {
-                        achievementCount++;
-                    }
-                    Console.WriteLine($"{game.Name} has {achievementCount} achievements.");
-                    gameStats.TotalAchievements = achievementCount;
                     ISteamWebResponse<PlayerAchievementResultModel> personalAchievements;
                     try
                     {
@@ -54,8 +47,16 @@ namespace steamachievements
                         Console.WriteLine($"{game.Name} has no achievements");
                         continue;
                     }
-                    var ownedAchievements = personalAchievements.Data.Achievements.Count();
-                    gameStats.OwnedAchievements = ownedAchievements;
+                    gameStats.TotalAchievements = personalAchievements.Data.Achievements.Count;
+                    var count = 0;
+                    foreach (var vexo in personalAchievements.Data.Achievements)
+                    {
+                        if (vexo.Achieved == 1)
+                        {
+                            count++;
+                        }
+                    }
+                    gameStats.OwnedAchievements = count;
                     gameAchievements.Add(gameStats);
                 }
             }
@@ -91,13 +92,12 @@ namespace steamachievements
             {
                 earnedAchievementTotal += gameAndAchievements.OwnedAchievements;
                 achievementTotal += gameAndAchievements.TotalAchievements;
-                decimal gamePercentage = (earnedAchievementTotal / achievementTotal) * 100;
-                gamePercentages.Add(gamePercentage);
             }
             decimal totalPercentage = gamePercentages.Sum();
-            decimal averagePercentage = Math.Round((totalPercentage / gamePercentages.Count()) * 100, 2);
+            decimal averagePercentage = (((achievementTotal - earnedAchievementTotal) / achievementTotal) * 100);
+            decimal roundedPercentage = Math.Round(averagePercentage, 2);
             Console.WriteLine($"Vexo has {earnedAchievementTotal} achievements out of a possible {achievementTotal} achievements");
-            Console.WriteLine($"This comes to an average completion percentage of {averagePercentage}");
+            Console.WriteLine($"This comes to an average completion percentage of {roundedPercentage}");
         }
     }
 }
