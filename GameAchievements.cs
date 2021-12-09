@@ -49,13 +49,17 @@ namespace steamachievements
                     }
                     gameStats.TotalAchievements = personalAchievements.Data.Achievements.Count;
                     var count = 0;
-                    foreach (var vexo in personalAchievements.Data.Achievements)
+                    foreach (var achievement in personalAchievements.Data.Achievements)
                     {
-                        if (vexo.Achieved == 1)
+                        if (achievement.Achieved == 1)
                         {
                             count++;
                         }
                     }
+                    // if (count == 0)
+                    // {
+                    //     gameStats.TotalAchievements = 0;
+                    // }
                     gameStats.OwnedAchievements = count;
                     gameAchievements.Add(gameStats);
                 }
@@ -86,16 +90,15 @@ namespace steamachievements
         public static void CalculateAccountStats(List<GameAchievements> gameAchievements)
         {
             var achievementTotal = 0;
-            int earnedAchievementTotal = 0;
-            List<Decimal> gamePercentages = new List<decimal>();
+            var earnedAchievementTotal = 0;
+            var gamePercentages = new List<decimal>();
             foreach (var gameAndAchievements in gameAchievements)
             {
                 earnedAchievementTotal += gameAndAchievements.OwnedAchievements;
                 achievementTotal += gameAndAchievements.TotalAchievements;
             }
-            decimal totalPercentage = gamePercentages.Sum();
-            decimal averagePercentage = (((achievementTotal - earnedAchievementTotal) / achievementTotal) * 100);
-            decimal roundedPercentage = Math.Round(averagePercentage, 2);
+            var averagePercentage = ((decimal)earnedAchievementTotal / (decimal)achievementTotal) * 100m;
+            var roundedPercentage = Math.Round(averagePercentage, 2);
             Console.WriteLine($"Vexo has {earnedAchievementTotal} achievements out of a possible {achievementTotal} achievements");
             Console.WriteLine($"This comes to an average completion percentage of {roundedPercentage}");
         }
