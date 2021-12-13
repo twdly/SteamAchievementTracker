@@ -61,7 +61,6 @@ namespace steamachievements
                     try
                     {
                         gameStats.gamePercentage = (decimal)gameStats.OwnedAchievements / (decimal)gameStats.TotalAchievements * 100;
-                        Console.WriteLine($"{gameStats.Name} has a percentage of {gameStats.gamePercentage}");
                     }
                     catch (System.DivideByZeroException)
                     {
@@ -105,7 +104,8 @@ namespace steamachievements
                 achievementTotal += gameAndAchievements.TotalAchievements;
                 totalPercentage += gameAndAchievements.gamePercentage;
             }
-            var averagePercentage = totalPercentage / gameAchievements.Count(game => game.OwnedAchievements != 0 && game.TotalAchievements != 0);
+            var eligibleGames = gameAchievements.Count(game => game.OwnedAchievements != 0 && game.TotalAchievements != 0);
+            var averagePercentage = totalPercentage / eligibleGames;
             var roundedPercentage = Math.Round(averagePercentage, 2);
             Console.WriteLine($"Vexo has {earnedAchievementTotal} achievements out of a possible {achievementTotal} achievements");
             Console.WriteLine($"This comes to an average completion percentage of {roundedPercentage}");
