@@ -34,7 +34,7 @@ namespace steamachievements
             }
             catch (System.Net.Http.HttpRequestException)
             {
-                Console.WriteLine("Unable to establish a connection to Steam. Please check your internet and try again");
+                Console.WriteLine("Unable to establish a connection to Steam. Please check your internet and try again. This may also mean you are using an invalid API key.");
                 System.Environment.Exit(1);
             }
 
@@ -245,6 +245,14 @@ namespace steamachievements
                 else if (args[0] == "-apikey")
                 {
                     Console.WriteLine("API key file not found.\nPlease use the -apikey argument followed by your key to set your API key.");
+                    System.Environment.Exit(1);
+                }
+            }
+            else if (args.Length == 0)
+            {
+                if (!File.Exists(@"apikey"))
+                {
+                    Console.WriteLine("API key has not yet been set. Please use the -apikey argument followed by your key to set your API key.");
                     System.Environment.Exit(1);
                 }
             }
