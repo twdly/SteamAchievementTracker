@@ -14,7 +14,6 @@ namespace steamachievements
     class GameAchievements
     {
         public string Name { get; set; }
-        public uint GameId { get; set; }
         public int TotalAchievements { get; set; }
         public int OwnedAchievements { get; set; }
         public decimal gamePercentage { get; set; }
@@ -26,7 +25,6 @@ namespace steamachievements
             foreach (var game in games.OwnedGames)
             {
                 var gameStats = new GameAchievements();
-                gameStats.GameId = game.AppId;
                 gameStats.Name = game.Name;
                 ISteamWebResponse<IReadOnlyCollection<GlobalAchievementPercentageModel>> achievements;
                 try
