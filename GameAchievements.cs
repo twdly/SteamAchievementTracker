@@ -18,6 +18,7 @@ namespace steamachievements
         public int OwnedAchievements { get; set; }
         public decimal gamePercentage { get; set; }
         public int sortScore { get; set; }
+        public double rarestAchievement { get; set; }
 
         public static async Task analyseAchievements(ISteamWebResponse<PlayerSummaryModel> playerSummaryResponse, OwnedGamesResultModel games, SteamUserStats steamUserStats, ulong userID)
         {
@@ -30,6 +31,7 @@ namespace steamachievements
                 try
                 {
                     achievements = await steamUserStats.GetGlobalAchievementPercentagesForAppAsync(game.AppId);
+                    gameStats.rarestAchievement = findRarestAchievement(achievements);
                 }
                 catch (System.Net.Http.HttpRequestException)
                 {
@@ -71,6 +73,21 @@ namespace steamachievements
             CalculateAccountStats(gameAchievements);
         }
 
+        private static double findRarestAchievement(ISteamWebResponse<IReadOnlyCollection<GlobalAchievementPercentageModel>> achievements)
+        {
+            var achievementlist = new List<GlobalAchievementPercentageModel>();
+            achievementlist = achievements.Data.ToList();
+            achievementlist = achievementlist.OrderBy(x => x.Percent).ToList();
+            if (achievementlist.Count != 0)
+            {
+                return achievementlist[0].Percent;
+            }
+            else
+            {
+                return 101;
+            }
+        }
+
         public static void CalculateAccountStats(List<GameAchievements> gameAchievements)
         {
             var gamePercentages = new List<decimal>();
@@ -100,8 +117,14 @@ namespace steamachievements
                 switch (input.ToLower())
                 {
                     case "unowned":
-                        findClosetoCompletion(gameAchievements);
+                        findCloseToCompletion(gameAchievements);
                         return;
+                    case "easiest":
+                        findEasiestToComplete(gameAchievements);
+                        return;
+                    case "help":
+                        Console.WriteLine("Valid selections include \"unowned\".");
+                        continue;
                     default:
                         Console.WriteLine("Invalid selection. Please type \"help\" for a list of valid selections.");
                         continue;
@@ -109,7 +132,21 @@ namespace steamachievements
             }
         }
 
-        private static void findClosetoCompletion(List<GameAchievements> gameAchievements)
+        private static void findEasiestToComplete(List<GameAchievements> gameAchievements)
+        {
+            gameAchievements.RemoveAll(game => game.TotalAchievements == game.OwnedAchievements || game.rarestAchievement == 101);
+            var newList = gameAchievements.OrderByDescending(game => game.rarestAchievement).ToList();
+            var showAchievementsCount = 5;
+            var count = 0;
+            Console.WriteLine("Based on the percentage of the hardest achievement, the following games are easiest to complete:");
+            while (count != showAchievementsCount)
+            {
+                Console.WriteLine($"{newList[count].Name} has a completion rate of {Math.Round(newList[count].rarestAchievement)}%.");
+                count++;
+            }
+        }
+
+        private static void findCloseToCompletion(List<GameAchievements> gameAchievements)
         {
             // Recommend games based on the number of unowned achievements.
             foreach (var game in gameAchievements)
