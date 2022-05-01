@@ -20,6 +20,7 @@ namespace steamachievements
 
         public static async Task analyseAchievements(ISteamWebResponse<PlayerSummaryModel> playerSummaryResponse, OwnedGamesResultModel games, SteamUserStats steamUserStats, ulong userID)
         {
+            Console.WriteLine("Obtaining achievement information. This may take a while for large libararies.");
             List<GameAchievements> gameAchievements = new List<GameAchievements>();
             foreach (var game in games.OwnedGames)
             {
