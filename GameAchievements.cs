@@ -121,7 +121,7 @@ namespace steamachievements
                         findEasiestToComplete(gameAchievements);
                         return;
                     case "help":
-                        Console.WriteLine("Valid selections include \"unowned\".");
+                        Console.WriteLine("Valid selections include \"unowned\" and \"easiest\".");
                         continue;
                     default:
                         Console.WriteLine("Invalid selection. Please type \"help\" for a list of valid selections.");

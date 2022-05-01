@@ -71,8 +71,11 @@ namespace steamachievements
                     case "achievements":
                         await GameAchievements.analyseAchievements(playerSummaryResponse, games, steamUserStats, userID);
                         return;
+                    case "help":
+                        Console.WriteLine("Valid options are \"games,\" \"playtime,\" \"random game\" and \"achievements\".");
+                        continue;
                     default:
-                        Console.WriteLine("That option cannot be found. Please check your spelling and try again.");
+                        Console.WriteLine("Invalid selection. Please type \"help\" for a list of valid selections.");
                         continue;
                 }
             }
@@ -127,7 +130,7 @@ namespace steamachievements
             {
                 gameList.Add(game.Name);
             }
-            Console.WriteLine($"Tæj mineself has decided that you will play {gameList[number]}");
+            Console.WriteLine($"Tæj has decided that you will play {gameList[number]}");
         }
 
         private static void checkGamesAmount(ISteamWebResponse<PlayerSummaryModel> playerSummaryResponse, OwnedGamesResultModel games)
