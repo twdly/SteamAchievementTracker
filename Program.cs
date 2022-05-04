@@ -130,7 +130,7 @@ namespace steamachievements
             {
                 gameList.Add(game.Name);
             }
-            Console.WriteLine($"Tæj has decided that you will play {gameList[number]}");
+            Console.WriteLine($"Tæj has decided that you will play {gameList[number]}.");
         }
 
         private static void checkGamesAmount(ISteamWebResponse<PlayerSummaryModel> playerSummaryResponse, OwnedGamesResultModel games)
